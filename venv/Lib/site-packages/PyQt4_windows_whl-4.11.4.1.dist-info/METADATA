@@ -1,0 +1,28 @@
+Metadata-Version: 1.2
+Name: PyQt4_windows_whl
+Version: 4.11.4.1
+Summary: Python bindings for the Qt cross platform GUI toolkit
+Home-page: https://github.com/takluyver/pyqt4_windows_whl
+License: UNKNOWN
+Author: Riverbank Computing
+Author-email: info@riverbankcomputing.com
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: MacOS X
+Classifier: Environment :: Win32 (MS Windows)
+Classifier: Environment :: X11 Applications :: Qt
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: C++
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Software Development :: User Interfaces
+Classifier: Topic :: Software Development :: Widget Sets
+
+PyQt4 is a comprehensive set of Python bindings for Digia’s Qt cross platform
+GUI toolkit. PyQt4 supports Python v2 and v3.
