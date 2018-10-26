@@ -8,6 +8,7 @@
 
 from PyQt4 import QtCore, QtGui, QtWebKit
 from lxml import html
+import multiprocessing
 
 import youtube_dl
 
@@ -37,51 +38,49 @@ import re
 import json
 from selenium import webdriver
 import progressbar
-def pushButtononClick():
 
-    #if CheckPORN68JAV() == "PASS":
-    #    print "Done"
+
+global OpenloadVedioPath
+global OpenloadVedioTitle
+
+def pushButtononClick():
+    if Check7MMTV() == "PASS":
+        if len(unicode(win.lineEdit.text())) is not 0:
+            print "Search and rename"
+            win.pushButton_4.setEnabled(True)
+        else:
+            print "Search Only"
+    else:
+        win.pushButton_3.setText(_translate("MainWindow", "無番號資訊", None))
 
     if CheckSDDPOAV() == "PASS":
-        print "Done"
-
-    #if Check7MMTV() == "PASS":
-    #    print "Done"
-    #else:
-    #    print "Error"
-
-
-
+        win.pushButton_3.setEnabled(True)
+    else:
+        win.pushButton_3.setText(_translate("MainWindow", "無片源", None))
 
 def CheckSDDPOAV():
     keyword = unicode(win.lineEdit_2.text())
     #print keyword
     res = requests.get('http://sddpoav.com/?s=' + keyword)
     if res.status_code == requests.codes.ok:
-        #print(str(res.status_code) + " OK")
-        #print(res.content)
         html = res.content
         soup = BeautifulSoup(html, 'html.parser')
         data = soup.find('div', attrs={'class': 'video'})
-        href = data.find('a').get('href')
-        #print href
+        if data is not None:
+            if data.find('a') is not None:
+                href = data.find('a').get('href')
+            else:
+                print "Cannot Find this AV Number - - http://sddpoav.com/"
+                return 1
+        else:
+            print "Cannot Find this AV Number - - http://sddpoav.com/"
+            return 1
         res = requests.get(href)
         if res.status_code == requests.codes.ok:
-            #print(str(res.status_code) + " OK")
-            # print(res.content)
             html = res.content
             soup = BeautifulSoup(html, 'html.parser')
             video_path = soup.find('div', attrs={'class': 'video_code'}).find('iframe').get('src')
-            #print video_path
-
-            #driver = webdriver.PhantomJS(executable_path='phantomjs.exe')
-            #driver = webdriver.Chrome(executable_path='chromedriver.exe')
-            #driver.get(video_path)
-            #pageSource = driver.page_source
-            #print pageSource
-
-
-
+            print video_path
             ydl = youtube_dl.YoutubeDL()
             with ydl:
                 youtube_dlresult = ydl.extract_info(
@@ -94,42 +93,14 @@ def CheckSDDPOAV():
             else:
             # Just a video
                 video = youtube_dlresult
-            print(video)
             #print(video)
             video_url = video['url']
-            print video_url
-            print video['title']
-
-            ydl = youtube_dl.YoutubeDL({'outtmpl': video['title']})
-            with ydl:
-                youtube_dlresult = ydl.extract_info(
-                    video_path,
-                    download=True  # !!We just want to extract the info
-                )
-            #print "Download from ",video_url,".."
-            #urllib.urlretrieve(video_url, "%s" %video['title'])
-
-            #r = requests.request("GET",video_url, stream=True)
-            #total_length = int(r.headers.get("Content-Length"))
-            #print total_length
-
-            #widgets = ['Progress: ', progressbar.Percentage(), ' ', progressbar.Bar(marker='#', left='[', right=']'),
-            #           ' ', progressbar.ETA(), ' ', progressbar.FileTransferSpeed()]
-
-            #pbar = progressbar.ProgressBar(widgets=widgets, maxval=total_length).start()
-
-            #with open(video['title'], 'wb') as f:
-
-            #    for chunk in r.iter_content(chunk_size=1):
-
-             #       if chunk:  # filter out keep-alive new chunks
-             #           f.write(chunk)
-             #           f.flush()
-             #       pbar.update(len(chunk) + 1)
-             #   pbar.finish()
-
-
-
+            global OpenloadVedioPath
+            global OpenloadVedioTitle
+            OpenloadVedioPath = video_url
+            OpenloadVedioTitle = video['title']
+            #print OpenloadVedioPath
+            #print OpenloadVedioTitle
 
 
     else:
@@ -142,8 +113,6 @@ def CheckPORN68JAV():
     keyword = unicode(win.lineEdit_2.text())
     res = requests.get('http://porn68jav.com/?s=' + keyword)
     if res.status_code == requests.codes.ok:
-        #print(str(res.status_code) + " OK")
-        #print(res.content)
         html = res.content
         soup = BeautifulSoup(html, 'html.parser')
         print '----------------'
@@ -192,21 +161,10 @@ def CheckPORN68JAV():
     return "PASS"
 
 def Check7MMTV():
-    print "Check7MMTV"
-    #res = requests.get('https://7mm.tv/')
-    #if res.status_code == requests.codes.ok:
-    #    print(str(res.status_code) + " OK")
-    #print(res.encoding)
-    #print(res.apparent_encoding)  # 当前网页的内容的实际编码
-#    print(res.content)  # content返回的是bytes型的原始数据
-#    print(res.text)  # text返回的是处理过的Unicode型的数据
-    #win.textEdit_2.setText(_translate("MainWindow", res.content, None))
     res = requests.post('https://7mm.tv/zh/searchform_search/all/index.html',
                         data={'search_keyword': unicode(win.lineEdit_2.text()), 'search_type': 'censored',
                         'op': 'search'})
     if res.status_code == requests.codes.ok:
-        #print(str(res.status_code) + " OK")
-        #print(res.content)
         html = res.content
         soup = BeautifulSoup(html, 'html.parser')
         print '----------------'
@@ -223,7 +181,6 @@ def Check7MMTV():
             return -1
         res = requests.get(topic_box.find('a').get('href'))
         if res.status_code == requests.codes.ok:
-            #print(str(res.status_code) + " OK")
             html = res.content
             soup = BeautifulSoup(html, 'html.parser')
             contents_title = soup.find('div', attrs={'id': 'contents_title'})
@@ -275,7 +232,7 @@ def Check7MMTV():
             time.sleep(1)
             tmp_img = QtGui.QPixmap("tmp.jpg").scaled(win.label_18.width(), win.label_18.height())
             win.label_18.setPixmap(tmp_img)
-            win.pushButton_4.setEnabled(True)
+            #win.pushButton_4.setEnabled(True)
             return "PASS"
 
 def pushButton_4onClick():
@@ -299,6 +256,20 @@ def pushButton_4onClick():
     os.rename("tmp.jpg", FilePath + NewNumber + "/" + NewFilename + ".jpg")
     os.rename(unicode(win.lineEdit.text()), FilePath + NewNumber + "/" + NewFilename + FileSubname)
     win.pushButton_4.setEnabled(False)
+
+def pushButton_3onClick():
+    print "pushButton_3onClick"
+    global OpenloadVedioPath
+    global OpenloadVedioTitle
+    #print OpenloadVedioPath
+    #print OpenloadVedioTitle
+    ydl = youtube_dl.YoutubeDL({'outtmpl': OpenloadVedioTitle})
+    with ydl:
+        youtube_dlresult = ydl.extract_info(
+            OpenloadVedioPath,
+            download=True  # !!We just want to extract the info
+        )
+    win.pushButton_3.setEnabled(False)
 
 class Ui_MainWindow(QtGui.QMainWindow):
 
@@ -500,6 +471,7 @@ class Ui_MainWindow(QtGui.QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.pushButton_4.setEnabled(False)
+        self.pushButton_3.setEnabled(False)
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "捷克練習", None))
         self.groupBox.setTitle(_translate("MainWindow", "搜尋目標", None))
@@ -507,7 +479,7 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.label_2.setText(_translate("MainWindow", "快速查詢", None))
         self.label_3.setText(_translate("MainWindow", "搜尋品番", None))
         self.pushButton.setText(_translate("MainWindow", "開始搜尋", None))
-        self.pushButton_3.setText(_translate("MainWindow", "熱鍵模式", None))
+        self.pushButton_3.setText(_translate("MainWindow", "加入下載", None))
         self.pushButton_2.setText(_translate("MainWindow", "設定", None))
         self.groupBox_2.setTitle(_translate("MainWindow", "搜尋結果", None))
         self.label_4.setText(_translate("MainWindow", "片名", None))
@@ -535,6 +507,7 @@ class Ui_MainWindow(QtGui.QMainWindow):
     def buttons_action(self, MainWindow):
         self.pushButton.clicked.connect(pushButtononClick)
         self.pushButton_4.clicked.connect(pushButton_4onClick)
+        self.pushButton_3.clicked.connect(pushButton_3onClick)
 
     def __init__(self):
         super(Ui_MainWindow, self).__init__()
