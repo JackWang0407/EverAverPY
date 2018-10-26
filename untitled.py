@@ -7,7 +7,6 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
-import sys
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -23,7 +22,7 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_MainWindow(QtGui.QMainWindow):
+class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(1070, 831)
@@ -237,7 +236,3 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.pushButton_4.setText(_translate("MainWindow", "重新命名", None))
         self.groupBox_4.setTitle(_translate("MainWindow", "搜尋狀態", None))
 
-app = QtGui.QApplication(sys.argv)
-win = Ui_MainWindow()
-win.show()
-sys.exit(app.exec_())

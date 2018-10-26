@@ -9,6 +9,8 @@
 from PyQt4 import QtCore, QtGui, QtWebKit
 from lxml import html
 
+import youtube_dl
+
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -34,7 +36,7 @@ import time
 import re
 import json
 from selenium import webdriver
-
+import progressbar
 def pushButtononClick():
 
     #if CheckPORN68JAV() == "PASS":
@@ -53,10 +55,10 @@ def pushButtononClick():
 
 def CheckSDDPOAV():
     keyword = unicode(win.lineEdit_2.text())
-    print keyword
+    #print keyword
     res = requests.get('http://sddpoav.com/?s=' + keyword)
     if res.status_code == requests.codes.ok:
-        print(str(res.status_code) + " OK")
+        #print(str(res.status_code) + " OK")
         #print(res.content)
         html = res.content
         soup = BeautifulSoup(html, 'html.parser')
@@ -70,29 +72,63 @@ def CheckSDDPOAV():
             html = res.content
             soup = BeautifulSoup(html, 'html.parser')
             video_path = soup.find('div', attrs={'class': 'video_code'}).find('iframe').get('src')
-            print video_path
-            #res = requests.get(video_path,stream=True)
-            res = requests.get(video_path)
-            if res.status_code == requests.codes.ok:
-                #print(str(res.status_code) + " OK")
-                html = res.content
-                soup = BeautifulSoup(html, 'html.parser')
-                strlist = video_path.split('/')
-                #for value in strlist:
-                #print strlist[4]
-                #print soup
-                #https://openload.co/stream/fZK3gBXQ2PM~1540489659~218.161.0.0~47Hapj7j?mime=true
-                #var suburl = "https:\/\/thumb.openload.co\/externsub\/1540491379~218.161.0.0~-wfI3Ywa~";
-                #print soup.find(text=re.compile(u'suburl')).replace(u"\n", "").replace(u"\t", "").replace(u" ", "").replace(u"varsuburl=\"https:\/\/thumb.openload.co\/externsub\/", "").replace(u"\";", "")
-                path_num = soup.find(text=re.compile(u'suburl')).replace(u"\n", "").replace(u"\t", "").replace(u" ", "").replace(u"varsuburl=\"https:\/\/thumb.openload.co\/externsub\/", "").replace(u"~\";", "")
-                vedio_path = "https://openload.co/stream/"+strlist[4]+"~"+path_num+"?mime=true"
-                print vedio_path
-                res = requests.get(video_path)
-                if res.status_code == requests.codes.ok:
-                    #html = res.content
-                    #soup = BeautifulSoup(html, 'html.parser')
-                    #print soup
-                    print res.headers['Content-Encoding']
+            #print video_path
+
+            #driver = webdriver.PhantomJS(executable_path='phantomjs.exe')
+            #driver = webdriver.Chrome(executable_path='chromedriver.exe')
+            #driver.get(video_path)
+            #pageSource = driver.page_source
+            #print pageSource
+
+
+
+            ydl = youtube_dl.YoutubeDL()
+            with ydl:
+                youtube_dlresult = ydl.extract_info(
+                    video_path,
+                    download=False  # !!We just want to extract the info
+                )
+            if 'entries' in youtube_dlresult:
+            # Can be a playlist or a list of videos
+                video = youtube_dlresult['entries'][0]
+            else:
+            # Just a video
+                video = youtube_dlresult
+            print(video)
+            #print(video)
+            video_url = video['url']
+            print video_url
+            print video['title']
+
+            ydl = youtube_dl.YoutubeDL({'outtmpl': video['title']})
+            with ydl:
+                youtube_dlresult = ydl.extract_info(
+                    video_path,
+                    download=True  # !!We just want to extract the info
+                )
+            #print "Download from ",video_url,".."
+            #urllib.urlretrieve(video_url, "%s" %video['title'])
+
+            #r = requests.request("GET",video_url, stream=True)
+            #total_length = int(r.headers.get("Content-Length"))
+            #print total_length
+
+            #widgets = ['Progress: ', progressbar.Percentage(), ' ', progressbar.Bar(marker='#', left='[', right=']'),
+            #           ' ', progressbar.ETA(), ' ', progressbar.FileTransferSpeed()]
+
+            #pbar = progressbar.ProgressBar(widgets=widgets, maxval=total_length).start()
+
+            #with open(video['title'], 'wb') as f:
+
+            #    for chunk in r.iter_content(chunk_size=1):
+
+             #       if chunk:  # filter out keep-alive new chunks
+             #           f.write(chunk)
+             #           f.flush()
+             #       pbar.update(len(chunk) + 1)
+             #   pbar.finish()
+
+
 
 
 
